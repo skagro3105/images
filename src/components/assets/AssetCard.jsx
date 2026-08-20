@@ -7,15 +7,23 @@ import {
   Package,
   Tag,
   FlaskConical,
-  Palette
+  Palette,
+  Trash2
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { useApp } from '../../contexts/AppContext';
 import { downloadOriginalAsset } from '../../utils/downloadHelper';
 
 export const AssetCard = ({ asset, onPreview, isSelected, onToggleSelect }) => {
-  const { favorites, toggleFavoriteAsset } = useApp();
+  const { favorites, toggleFavoriteAsset, deleteAsset } = useApp();
   const isFav = favorites.includes(asset.id);
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete asset "${asset.name}"?`)) {
+      deleteAsset(asset.id);
+    }
+  };
 
   const getAssetIcon = (type) => {
     switch (type) {
@@ -82,30 +90,47 @@ export const AssetCard = ({ asset, onPreview, isSelected, onToggleSelect }) => {
           </div>
         )}
 
-        {/* Favorite Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleFavoriteAsset(asset.id);
-          }}
-          className={`absolute top-3 right-3 p-1.5 rounded-lg backdrop-blur-md transition-all z-10 ${
-            isFav
-              ? 'bg-amber-500 text-white'
-              : 'bg-white/70 dark:bg-[#111815]/70 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-amber-500'
-          }`}
-          title="Favorite Asset"
-        >
-          <Star className={`w-3.5 h-3.5 ${isFav ? 'fill-current' : ''}`} />
-        </button>
+        {/* Top Right Action Buttons (Delete & Favorite) */}
+        <div className="absolute top-3 right-3 flex items-center gap-1 z-10">
+          <button
+            onClick={handleDelete}
+            className="p-1.5 rounded-lg bg-white/80 dark:bg-[#111815]/80 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-red-600 hover:bg-white backdrop-blur-md transition-all"
+            title="Delete Asset"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFavoriteAsset(asset.id);
+            }}
+            className={`p-1.5 rounded-lg backdrop-blur-md transition-all ${
+              isFav
+                ? 'bg-amber-500 text-white'
+                : 'bg-white/70 dark:bg-[#111815]/70 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-amber-500'
+            }`}
+            title="Favorite Asset"
+          >
+            <Star className={`w-3.5 h-3.5 ${isFav ? 'fill-current' : ''}`} />
+          </button>
+        </div>
 
         {/* Hover Quick Action Overlay */}
-        <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-xs">
+        <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-xs">
           <button
             onClick={handleDownload}
-            className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all transform group-hover:scale-105"
+            className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition-all transform group-hover:scale-105"
             title="Download Original Asset"
           >
-            <Download className="w-4 h-4" /> Download Asset
+            <Download className="w-3.5 h-3.5" /> Download
+          </button>
+          <button
+            onClick={handleDelete}
+            className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition-all transform group-hover:scale-105"
+            title="Delete Asset"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Delete
           </button>
         </div>
       </div>

@@ -312,9 +312,6 @@ export const ProductDetails = ({ onOpenAddAsset }) => {
           <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
             No assets linked for {product.name} under {selectedAssetCategory === 'All' ? 'this filter' : selectedAssetCategory}.
           </p>
-          <Button variant="secondary" size="sm" onClick={() => onOpenAddAsset(product.id)}>
-            + Upload Asset for {product.name}
-          </Button>
         </div>
       )}
 

@@ -446,7 +446,7 @@ export const AddAssetModal = ({ isOpen, onClose, defaultProductId = '' }) => {
           >
             {products.map((p) => (
               <option key={p.id} value={p.id} className="bg-white dark:bg-[#16201C]">
-                {p.name} {p.product_code ? `(${p.product_code})` : ''}
+                {p.name}{p.product_code && String(p.product_code).trim() ? ` (${p.product_code})` : ''}
               </option>
             ))}
           </select>

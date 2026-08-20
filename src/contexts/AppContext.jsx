@@ -115,6 +115,21 @@ export const AppProvider = ({ children }) => {
     return created;
   };
 
+  const deleteAsset = async (id) => {
+    const targetAsset = assets.find((a) => String(a.id) === String(id));
+    await assetsApi.deleteAsset(id);
+    setAssets((prev) => prev.filter((a) => String(a.id) !== String(id)));
+    if (targetAsset?.product_id) {
+      setProducts((prev) =>
+        prev.map((p) =>
+          String(p.id) === String(targetAsset.product_id)
+            ? { ...p, asset_count: Math.max(0, (p.asset_count || 1) - 1) }
+            : p
+        )
+      );
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -136,6 +151,7 @@ export const AppProvider = ({ children }) => {
         updateProduct,
         deleteProduct,
         addAsset,
+        deleteAsset,
         loading
       }}
     >

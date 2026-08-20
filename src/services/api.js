@@ -217,6 +217,20 @@ export const assetsApi = {
       created_at: new Date().toISOString(),
     };
   },
+
+  async deleteAsset(id) {
+    const supabase = getSupabaseClient();
+    const isValidUUID = (id) => typeof id === 'string' && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+    if (supabase && isValidUUID(id)) {
+      try {
+        const { error } = await supabase.from('assets').delete().eq('id', id);
+        if (error) console.error('[Supabase Delete Asset Error]:', error);
+      } catch (err) {
+        console.error('[Supabase Delete Asset Exception]:', err);
+      }
+    }
+    return { id };
+  },
 };
 
 // ==============================================================================
