@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply font-sans text-slate-900 dark:text-slate-100 bg-[#F8FAF9] dark:bg-[#090D0B] antialiased transition-colors duration-200;
+  }
+
+  /* Force Capitalize First Letter of Every Word (Title Case) on all text inputs */
+  input[type="text"]:not(.font-mono),
+  textarea {
+    text-transform: capitalize;
+  }
+}
+
+/* Unified Light & Dark Color Tokens */
+.app-card {
+  @apply bg-white dark:bg-[#111815] border border-slate-200/80 dark:border-emerald-950/60 shadow-xs;
+}
+
+.app-subtle-bg {
+  @apply bg-slate-50 dark:bg-[#16201C] border border-slate-200 dark:border-emerald-950/80;
+}
+
+.app-input {
+  @apply bg-slate-50 dark:bg-[#16201C] border border-slate-200 dark:border-emerald-950/80 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 capitalize;
+}
+
+/* Minimal smooth scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300/80 dark:bg-[#1B2722] rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-[#24332D];
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  @apply bg-white/90 dark:bg-[#111815]/90 backdrop-blur-md border border-slate-200/80 dark:border-emerald-950/60;
+}
+
+/* Subtle Shimmer for Skeletons */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(241, 245, 249, 0.6) 25%, rgba(226, 232, 240, 0.9) 37%, rgba(241, 245, 249, 0.6) 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(17, 24, 21, 0.6) 25%, rgba(27, 39, 34, 0.9) 37%, rgba(17, 24, 21, 0.6) 63%);
+  background-size: 200% 100%;
+}
