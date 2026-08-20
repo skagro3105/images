@@ -385,15 +385,25 @@ export const AddAssetModal = ({ isOpen, onClose, defaultProductId = '' }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!targetProductId || extraAssets.length === 0 || isSubmitting) return;
+    const effectiveProductId = targetProductId || defaultProductId || (products.length > 0 ? products[0].id : '');
+
+    if (!effectiveProductId) {
+      alert('Please select a target product.');
+      return;
+    }
+    if (extraAssets.length === 0) {
+      alert('Please select at least one asset file to attach.');
+      return;
+    }
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const prodObj = products.find((p) => String(p.id) === String(targetProductId));
+      const prodObj = products.find((p) => String(p.id) === String(effectiveProductId));
 
       for (const asset of extraAssets) {
         await addAsset({
-          product_id: targetProductId,
+          product_id: effectiveProductId,
           product_name: prodObj?.name || 'General Product',
           name: toTitleCase(asset.name),
           asset_type: asset.asset_type,
@@ -411,6 +421,7 @@ export const AddAssetModal = ({ isOpen, onClose, defaultProductId = '' }) => {
       onClose();
     } catch (err) {
       console.error('Error saving assets:', err);
+      alert(`Error saving assets: ${err?.message || 'Failed to save'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -435,7 +446,7 @@ export const AddAssetModal = ({ isOpen, onClose, defaultProductId = '' }) => {
           >
             {products.map((p) => (
               <option key={p.id} value={p.id} className="bg-white dark:bg-[#16201C]">
-                {p.name} ({p.product_code})
+                {p.name} {p.product_code ? `(${p.product_code})` : ''}
               </option>
             ))}
           </select>
