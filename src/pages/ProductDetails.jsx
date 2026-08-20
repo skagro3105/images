@@ -21,7 +21,7 @@ import JSZip from 'jszip';
 export const ProductDetails = ({ onOpenAddAsset }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { products, assets, favorites, toggleFavoriteProduct, deleteProduct, setActiveLightboxAsset } = useApp();
+  const { products, assets, favorites, toggleFavoriteProduct, deleteProduct, setActiveLightboxAsset, deleteAsset } = useApp();
 
   // Find product by id or product_code
   const product = products.find((p) => String(p.id) === String(id) || String(p.product_code) === String(id));
@@ -251,10 +251,14 @@ export const ProductDetails = ({ onOpenAddAsset }) => {
               <Button
                 size="sm"
                 className="bg-red-600 hover:bg-red-700 text-white border-none"
-                onClick={() => {
+                onClick={async () => {
                   if (window.confirm(`Delete these ${selectedAssetIds.length} assets? This cannot be undone.`)) {
-                    selectedAssetIds.forEach(id => deleteAsset(id));
-                    setSelectedAssetIds([]);
+                    try {
+                      await Promise.all(selectedAssetIds.map(id => deleteAsset(id)));
+                      setSelectedAssetIds([]);
+                    } catch (err) {
+                      alert('Failed to delete assets. They may not be synced to the database yet or there is a network error.');
+                    }
                   }
                 }}
               >

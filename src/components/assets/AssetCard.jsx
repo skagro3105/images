@@ -18,10 +18,14 @@ export const AssetCard = ({ asset, onPreview, isSelected, onToggleSelect }) => {
   const { favorites, toggleFavoriteAsset, deleteAsset } = useApp();
   const isFav = favorites.includes(asset.id);
 
-  const handleDelete = (e) => {
+  const handleDelete = async (e) => {
     e.stopPropagation();
     if (window.confirm(`Are you sure you want to delete asset "${asset.name}"?`)) {
-      deleteAsset(asset.id);
+      try {
+        await deleteAsset(asset.id);
+      } catch (err) {
+        alert('Failed to delete asset. It may not be synced yet.');
+      }
     }
   };
 

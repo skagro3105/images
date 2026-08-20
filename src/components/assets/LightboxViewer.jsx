@@ -50,10 +50,14 @@ export const LightboxViewer = ({ assetList = [], initialAssetId, onClose }) => {
     downloadOriginalAsset(currentAsset.file_url, currentAsset.name, currentAsset.file_type);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete asset "${currentAsset.name}"?`)) {
-      deleteAsset(currentAsset.id);
-      onClose();
+      try {
+        await deleteAsset(currentAsset.id);
+        onClose();
+      } catch (err) {
+        alert('Failed to delete asset. It may not be synced yet.');
+      }
     }
   };
 

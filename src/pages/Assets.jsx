@@ -82,10 +82,14 @@ export const Assets = ({ onOpenAddAsset }) => {
             <>
               <Button
                 className="bg-red-600 hover:bg-red-700 text-white border-none"
-                onClick={() => {
+                onClick={async () => {
                   if (window.confirm(`Delete these ${selectedAssetIds.length} assets? This cannot be undone.`)) {
-                    selectedAssetIds.forEach(id => deleteAsset(id));
-                    setSelectedAssetIds([]);
+                    try {
+                      await Promise.all(selectedAssetIds.map(id => deleteAsset(id)));
+                      setSelectedAssetIds([]);
+                    } catch (err) {
+                      alert('Failed to delete assets. They may not be synced to the database yet or there is a network error.');
+                    }
                   }
                 }}
               >

@@ -220,15 +220,19 @@ export const assetsApi = {
 
   async deleteAsset(id) {
     const supabase = getSupabaseClient();
+    if (!supabase) throw new Error('Supabase client not configured.');
+    
     const isValidUUID = (id) => typeof id === 'string' && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
-    if (supabase && isValidUUID(id)) {
-      try {
-        const { error } = await supabase.from('assets').delete().eq('id', id);
-        if (error) console.error('[Supabase Delete Asset Error]:', error);
-      } catch (err) {
-        console.error('[Supabase Delete Asset Exception]:', err);
-      }
+    if (!isValidUUID(id)) {
+      throw new Error(`Invalid asset ID format: ${id}. Expected UUID.`);
     }
+
+    const { error } = await supabase.from('assets').delete().eq('id', id);
+    if (error) {
+      console.error('[Supabase Delete Asset Error]:', error);
+      throw error;
+    }
+    
     return { id };
   },
 };
