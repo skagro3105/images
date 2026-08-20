@@ -121,11 +121,11 @@ export const productsApi = {
       updated_at: new Date().toISOString()
     };
 
-    if (supabase) {
+    if (supabase && isValidUUID(id)) {
       try {
         const { data, error } = await supabase.from('products').update(updatePayload).eq('id', id).select();
         if (error) console.error('[Supabase Update Product Error]:', error);
-        if (!error && data && data.length > 0) return data[0];
+        if (!error && data && data.length > 0) return { ...data[0], id };
       } catch (err) {
         console.error('[Supabase Update Product Exception]:', err);
       }
@@ -136,7 +136,8 @@ export const productsApi = {
 
   async deleteProduct(id) {
     const supabase = getSupabaseClient();
-    if (supabase) {
+    const isValidUUID = (id) => typeof id === 'string' && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+    if (supabase && isValidUUID(id)) {
       try {
         const { error } = await supabase.from('products').delete().eq('id', id);
         if (error) console.error('[Supabase Delete Product Error]:', error);
@@ -198,7 +199,12 @@ export const assetsApi = {
       try {
         const { data, error } = await supabase.from('assets').insert([assetPayload]).select();
         if (error) console.error('[Supabase Asset Upload Error]:', error);
-        if (!error && data && data.length > 0) return data[0];
+        if (!error && data && data.length > 0) {
+          return {
+            ...data[0],
+            product_id: data[0].product_id || assetData.product_id || null,
+          };
+        }
       } catch (err) {
         console.error('[Supabase Asset Upload Exception]:', err);
       }

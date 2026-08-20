@@ -594,15 +594,19 @@ export const EditProductModal = ({ isOpen, onClose, product }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!product?.id || !formData.name || isSubmitting) return;
+    if (!product?.id || !formData.name) {
+      alert('Missing product details.');
+      return;
+    }
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const catObj = categories.find((c) => c.id === formData.category_id);
+      const catObj = categories.find((c) => String(c.id) === String(formData.category_id));
       await updateProduct(product.id, {
         ...formData,
         name: toTitleCase(formData.name),
-        category_name: catObj?.name || product.category_name,
+        category_name: catObj?.name || product.category_name || 'General',
         file_base64: fileBase64,
         file_name: fileName,
       });
@@ -610,6 +614,7 @@ export const EditProductModal = ({ isOpen, onClose, product }) => {
       onClose();
     } catch (err) {
       console.error('Error updating product:', err);
+      alert(`Error updating product: ${err?.message || 'Failed'}`);
     } finally {
       setIsSubmitting(false);
     }
