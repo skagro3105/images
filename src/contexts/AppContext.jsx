@@ -12,10 +12,22 @@ export const AppProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [assets, setAssets] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [categories, setCategories] = useState(() => {
+    const saved = localStorage.getItem('sk_categories');
+    return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+  });
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('sk_products');
+    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+  });
+  const [assets, setAssets] = useState(() => {
+    const saved = localStorage.getItem('sk_assets');
+    return saved ? JSON.parse(saved) : INITIAL_ASSETS;
+  });
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem('sk_favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [activeLightboxAsset, setActiveLightboxAsset] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,6 +45,23 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('sk_theme', theme);
   }, [theme]);
 
+  // Persist state to localStorage
+  useEffect(() => {
+    localStorage.setItem('sk_categories', JSON.stringify(categories));
+  }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem('sk_products', JSON.stringify(products));
+  }, [products]);
+
+  useEffect(() => {
+    localStorage.setItem('sk_assets', JSON.stringify(assets));
+  }, [assets]);
+
+  useEffect(() => {
+    localStorage.setItem('sk_favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
   // Fetch live Supabase data directly from Cloud Database
   const loadData = async () => {
     setLoading(true);
@@ -43,9 +72,9 @@ export const AppProvider = ({ children }) => {
           productsApi.getProducts(),
           assetsApi.getAssets()
         ]);
-        if (cats) setCategories(cats);
-        if (prods) setProducts(prods);
-        if (asts) setAssets(asts);
+        if (cats && cats.length > 0) setCategories(cats);
+        if (prods && prods.length > 0) setProducts(prods);
+        if (asts && asts.length > 0) setAssets(asts);
       }
     } catch (e) {
       console.error('Supabase fetch error:', e);
