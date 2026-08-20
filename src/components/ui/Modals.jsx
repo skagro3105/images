@@ -122,6 +122,7 @@ export const AddProductModal = ({ isOpen, onClose }) => {
       onClose();
     } catch (err) {
       console.error('Error creating product:', err);
+      alert(`Failed to save product. Please check your connection and try again.\n\nError: ${err.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }

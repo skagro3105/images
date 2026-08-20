@@ -53,11 +53,11 @@ export const productsApi = {
 
     try {
       const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-      if (error || !data) return [];
-      return data;
+      if (error) throw error;
+      return data || [];
     } catch (err) {
       console.error('[Supabase Products Fetch Error]:', err);
-      return [];
+      throw err;
     }
   },
 
@@ -71,12 +71,11 @@ export const productsApi = {
       if (uploadedUrl) mainImageUrl = uploadedUrl;
     }
 
-    const autoProductCode = productData.product_code || `SK-PROD-${Date.now().toString().slice(-4)}`;
     const isValidUUID = (id) => typeof id === 'string' && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
 
     const newProdPayload = {
       name: productData.name,
-      product_code: autoProductCode,
+      // product_code is removed as it's not in the database schema
       category_id: isValidUUID(productData.category_id) ? productData.category_id : null,
       category_name: productData.category_name || 'General',
       description: productData.description || '',
@@ -85,15 +84,16 @@ export const productsApi = {
     };
 
     if (supabase) {
-      try {
-        const { data, error } = await supabase.from('products').insert([newProdPayload]).select();
-        if (error) console.error('[Supabase Create Product Error]:', error);
-        if (!error && data && data.length > 0) return data[0];
-      } catch (err) {
-        console.error('[Supabase Create Product Exception]:', err);
+      const { data, error } = await supabase.from('products').insert([newProdPayload]).select();
+      if (error) {
+        console.error('[Supabase Create Product Error]:', error);
+        throw error;
       }
+      if (data && data.length > 0) return data[0];
+      throw new Error('No data returned from product creation');
     }
 
+    // Fallback for unconfigured
     return {
       ...newProdPayload,
       id: `prod-${Date.now()}`,
@@ -122,27 +122,28 @@ export const productsApi = {
     };
 
     if (supabase && isValidUUID(id)) {
-      try {
-        const { data, error } = await supabase.from('products').update(updatePayload).eq('id', id).select();
-        if (error) console.error('[Supabase Update Product Error]:', error);
-        if (!error && data && data.length > 0) return { ...data[0], id };
-      } catch (err) {
-        console.error('[Supabase Update Product Exception]:', err);
+      const { data, error } = await supabase.from('products').update(updatePayload).eq('id', id).select();
+      if (error) {
+        console.error('[Supabase Update Product Error]:', error);
+        throw error;
       }
+      if (data && data.length > 0) return { ...data[0], id };
+      throw new Error('No data returned from product update');
     }
 
+    // Fallback for unconfigured
     return { id, ...updatePayload };
   },
 
   async deleteProduct(id) {
     const supabase = getSupabaseClient();
     const isValidUUID = (id) => typeof id === 'string' && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+    
     if (supabase && isValidUUID(id)) {
-      try {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) console.error('[Supabase Delete Product Error]:', error);
-      } catch (err) {
-        console.error('[Supabase Delete Product Exception]:', err);
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) {
+        console.error('[Supabase Delete Product Error]:', error);
+        throw error;
       }
     }
     return { id };
@@ -162,11 +163,11 @@ export const assetsApi = {
       if (productId) query = query.eq('product_id', productId);
 
       const { data, error } = await query;
-      if (error || !data) return [];
-      return data;
+      if (error) throw error;
+      return data || [];
     } catch (err) {
       console.error('[Supabase Assets Fetch Error]:', err);
-      return [];
+      throw err;
     }
   },
 
@@ -196,20 +197,21 @@ export const assetsApi = {
     };
 
     if (supabase) {
-      try {
-        const { data, error } = await supabase.from('assets').insert([assetPayload]).select();
-        if (error) console.error('[Supabase Asset Upload Error]:', error);
-        if (!error && data && data.length > 0) {
-          return {
-            ...data[0],
-            product_id: data[0].product_id || assetData.product_id || null,
-          };
-        }
-      } catch (err) {
-        console.error('[Supabase Asset Upload Exception]:', err);
+      const { data, error } = await supabase.from('assets').insert([assetPayload]).select();
+      if (error) {
+        console.error('[Supabase Asset Upload Error]:', error);
+        throw error;
       }
+      if (data && data.length > 0) {
+        return {
+          ...data[0],
+          product_id: data[0].product_id || assetData.product_id || null,
+        };
+      }
+      throw new Error('No data returned from asset upload');
     }
 
+    // Fallback for unconfigured
     return {
       ...assetPayload,
       product_id: assetData.product_id || null,
