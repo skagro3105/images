@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 import JSZip from 'jszip';
 
 export const Assets = ({ onOpenAddAsset }) => {
-  const { assets, setActiveLightboxAsset } = useApp();
+  const { assets, setActiveLightboxAsset, deleteAsset } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('All');
   const [selectedAssetIds, setSelectedAssetIds] = useState([]);
@@ -79,14 +79,27 @@ export const Assets = ({ onOpenAddAsset }) => {
 
         <div className="flex items-center gap-3">
           {selectedAssetIds.length > 0 && (
-            <Button
-              variant="primary"
-              icon={FolderArchive}
-              disabled={isZipping}
-              onClick={handleBulkDownload}
-            >
-              {isZipping ? 'Zipping...' : `Download ${selectedAssetIds.length} Assets`}
-            </Button>
+            <>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white border-none"
+                onClick={() => {
+                  if (window.confirm(`Delete these ${selectedAssetIds.length} assets? This cannot be undone.`)) {
+                    selectedAssetIds.forEach(id => deleteAsset(id));
+                    setSelectedAssetIds([]);
+                  }
+                }}
+              >
+                Delete Selected
+              </Button>
+              <Button
+                variant="primary"
+                icon={FolderArchive}
+                disabled={isZipping}
+                onClick={handleBulkDownload}
+              >
+                {isZipping ? 'Zipping...' : `Download ${selectedAssetIds.length} Assets`}
+              </Button>
+            </>
           )}
           <Button variant="primary" icon={Plus} onClick={onOpenAddAsset}>
             Link New Asset

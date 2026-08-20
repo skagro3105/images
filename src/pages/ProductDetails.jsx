@@ -250,6 +250,18 @@ export const ProductDetails = ({ onOpenAddAsset }) => {
               <span>{selectedAssetIds.length} Selected</span>
               <Button
                 size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white border-none"
+                onClick={() => {
+                  if (window.confirm(`Delete these ${selectedAssetIds.length} assets? This cannot be undone.`)) {
+                    selectedAssetIds.forEach(id => deleteAsset(id));
+                    setSelectedAssetIds([]);
+                  }
+                }}
+              >
+                Delete Selected
+              </Button>
+              <Button
+                size="sm"
                 variant="primary"
                 icon={FolderArchive}
                 disabled={isZipping}

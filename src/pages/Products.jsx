@@ -9,7 +9,7 @@ import { EditProductModal } from '../components/ui/Modals';
 import JSZip from 'jszip';
 
 export const CatalogHub = ({ onOpenAddProduct, onOpenAddAsset }) => {
-  const { products, assets, categories, setActiveLightboxAsset, deleteProduct } = useApp();
+  const { products, assets, categories, setActiveLightboxAsset, deleteProduct, deleteAsset } = useApp();
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -126,15 +126,29 @@ export const CatalogHub = ({ onOpenAddProduct, onOpenAddAsset }) => {
 
         <div className="flex items-center gap-2 sm:gap-3 self-start sm:self-auto">
           {activeTab === 'assets' && selectedAssetIds.length > 0 && (
-            <Button
-              variant="primary"
-              size="sm"
-              icon={FolderArchive}
-              disabled={isZipping}
-              onClick={handleBulkDownload}
-            >
-              {isZipping ? 'Zipping...' : `ZIP (${selectedAssetIds.length})`}
-            </Button>
+            <>
+              <Button
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white border-none"
+                onClick={() => {
+                  if (window.confirm(`Delete these ${selectedAssetIds.length} assets? This cannot be undone.`)) {
+                    selectedAssetIds.forEach(id => deleteAsset(id));
+                    setSelectedAssetIds([]);
+                  }
+                }}
+              >
+                Delete Selected
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                icon={FolderArchive}
+                disabled={isZipping}
+                onClick={handleBulkDownload}
+              >
+                {isZipping ? 'Zipping...' : `ZIP (${selectedAssetIds.length})`}
+              </Button>
+            </>
           )}
           <Button variant="primary" size="sm" icon={Plus} onClick={onOpenAddProduct}>
             Add Product

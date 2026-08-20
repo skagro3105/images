@@ -53,7 +53,14 @@ export const AssetCard = ({ asset, onPreview, isSelected, onToggleSelect }) => {
     >
       {/* Thumbnail Area - Using object-contain and p-2 so full image bottle/pack fits inside cleanly */}
       <div
-        onClick={() => onPreview && onPreview(asset)}
+        onClick={(e) => {
+          const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+          if (isTouch) {
+            handleDownload(e);
+          } else {
+            onPreview && onPreview(asset);
+          }
+        }}
         className="relative aspect-4/3 bg-slate-100/60 dark:bg-[#16201C] overflow-hidden cursor-pointer p-2 flex items-center justify-center"
       >
         {asset.file_type?.includes('pdf') ? (
@@ -79,19 +86,19 @@ export const AssetCard = ({ asset, onPreview, isSelected, onToggleSelect }) => {
               e.stopPropagation();
               onToggleSelect(asset.id);
             }}
-            className="absolute top-3 left-3 z-10"
+            className="absolute top-1 left-1 p-2 z-10"
           >
             <input
               type="checkbox"
               checked={isSelected}
               onChange={() => {}}
-              className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shadow-sm"
             />
           </div>
         )}
 
-        {/* Top Right Action Buttons (Delete & Favorite) */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 z-10">
+        {/* Top Right Action Buttons (Delete & Favorite) - Hidden on Mobile */}
+        <div className="hidden md:flex absolute top-3 right-3 items-center gap-1 z-10">
           <button
             onClick={handleDelete}
             className="p-1.5 rounded-lg bg-white/80 dark:bg-[#111815]/80 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-red-600 hover:bg-white backdrop-blur-md transition-all"
@@ -116,8 +123,8 @@ export const AssetCard = ({ asset, onPreview, isSelected, onToggleSelect }) => {
           </button>
         </div>
 
-        {/* Hover Quick Action Overlay */}
-        <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-xs">
+        {/* Hover Quick Action Overlay - Hidden on Mobile */}
+        <div className="hidden md:flex absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity items-center justify-center gap-2 backdrop-blur-xs">
           <button
             onClick={handleDownload}
             className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition-all transform group-hover:scale-105"
