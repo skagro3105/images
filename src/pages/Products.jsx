@@ -31,19 +31,26 @@ export const CatalogHub = ({ onOpenAddProduct, onOpenAddAsset }) => {
   // Filter Products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
+      const name = (p.name || '').toLowerCase();
+      const ingredient = (p.active_ingredient || '').toLowerCase();
+      const code = (p.product_code || '').toLowerCase();
+      const catName = (p.category_name || '').toLowerCase();
+      const formulation = p.formulation || '';
+      const q = searchQuery.toLowerCase();
+
       const matchesSearch =
         !searchQuery ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.active_ingredient.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.product_code.toLowerCase().includes(searchQuery.toLowerCase());
+        name.includes(q) ||
+        ingredient.includes(q) ||
+        code.includes(q);
 
       const matchesCat =
         selectedCategory === 'all' ||
-        p.category_name.toLowerCase() === selectedCategory.toLowerCase() ||
-        categories.find((c) => c.slug === selectedCategory)?.name.toLowerCase() === p.category_name.toLowerCase();
+        catName === selectedCategory.toLowerCase() ||
+        categories.find((c) => c.slug === selectedCategory)?.name?.toLowerCase() === catName;
 
       const matchesFormulation =
-        selectedFormulation === 'all' || p.formulation === selectedFormulation;
+        selectedFormulation === 'all' || formulation === selectedFormulation;
 
       return matchesSearch && matchesCat && matchesFormulation;
     });
@@ -52,11 +59,16 @@ export const CatalogHub = ({ onOpenAddProduct, onOpenAddAsset }) => {
   // Filter Assets
   const filteredAssets = useMemo(() => {
     return assets.filter((a) => {
+      const name = (a.name || '').toLowerCase();
+      const productName = (a.product_name || '').toLowerCase();
+      const packingSize = (a.packing_size || '').toLowerCase();
+      const q = searchQuery.toLowerCase();
+
       const matchesSearch =
         !searchQuery ||
-        a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.packing_size.toLowerCase().includes(searchQuery.toLowerCase());
+        name.includes(q) ||
+        productName.includes(q) ||
+        packingSize.includes(q);
 
       const matchesType = selectedAssetType === 'all' || a.asset_type === selectedAssetType;
       return matchesSearch && matchesType;
