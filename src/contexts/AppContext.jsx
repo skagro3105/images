@@ -72,9 +72,24 @@ export const AppProvider = ({ children }) => {
           productsApi.getProducts(),
           assetsApi.getAssets()
         ]);
-        if (cats && cats.length > 0) setCategories(cats);
-        if (prods && prods.length > 0) setProducts(prods);
-        if (asts && asts.length > 0) setAssets(asts);
+        
+        if (cats) {
+          const localCats = JSON.parse(localStorage.getItem('sk_categories') || '[]');
+          const localOnlyCats = localCats.filter(c => String(c.id).startsWith('cat-') && !cats.find(sc => sc.id === c.id));
+          setCategories([...cats, ...localOnlyCats].length > 0 ? [...cats, ...localOnlyCats] : INITIAL_CATEGORIES);
+        }
+        
+        if (prods) {
+          const localProds = JSON.parse(localStorage.getItem('sk_products') || '[]');
+          const localOnlyProds = localProds.filter(p => String(p.id).startsWith('prod-') && !prods.find(sp => sp.id === p.id));
+          setProducts([...prods, ...localOnlyProds]);
+        }
+        
+        if (asts) {
+          const localAsts = JSON.parse(localStorage.getItem('sk_assets') || '[]');
+          const localOnlyAsts = localAsts.filter(a => String(a.id).startsWith('asset-') && !asts.find(sa => sa.id === a.id));
+          setAssets([...asts, ...localOnlyAsts]);
+        }
       }
     } catch (e) {
       console.error('Supabase fetch error:', e);
