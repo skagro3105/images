@@ -70,11 +70,14 @@ export const AddProductModal = ({ isOpen, onClose }) => {
     setExtraAssets((prev) => prev.filter((a) => a.id !== id));
   };
 
+  const [formError, setFormError] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || isSubmitting) return;
 
     setIsSubmitting(true);
+    setFormError('');
     try {
       const catObj = categories.find((c) => c.id === formData.category_id);
       const autoProductCode = `SK-PROD-${Date.now().toString().slice(-4)}`;
@@ -122,7 +125,7 @@ export const AddProductModal = ({ isOpen, onClose }) => {
       onClose();
     } catch (err) {
       console.error('Error creating product:', err);
-      alert(`Failed to save product. Please check your connection and try again.\n\nError: ${err.message || 'Unknown error'}`);
+      setFormError(`Failed to save product: ${err?.message || 'Unknown database error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -136,6 +139,11 @@ export const AddProductModal = ({ isOpen, onClose }) => {
       subtitle="Add a new product to the catalog and attach initial media files below."
     >
       <form onSubmit={handleSubmit} className="space-y-5">
+        {formError && (
+          <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs font-bold text-center">
+            {formError}
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5 uppercase tracking-wider">
