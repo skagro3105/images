@@ -15,19 +15,19 @@ export const CommandPalette = () => {
   const filteredProducts = trimmed
     ? products.filter(
         (p) =>
-          p.name.toLowerCase().includes(trimmed) ||
-          p.active_ingredient.toLowerCase().includes(trimmed) ||
-          p.formulation.toLowerCase().includes(trimmed) ||
-          p.product_code.toLowerCase().includes(trimmed)
+          (p.name || '').toLowerCase().includes(trimmed) ||
+          (p.active_ingredient || '').toLowerCase().includes(trimmed) ||
+          (p.formulation || '').toLowerCase().includes(trimmed) ||
+          (p.product_code || '').toLowerCase().includes(trimmed)
       )
     : products.slice(0, 4);
 
   const filteredAssets = trimmed
     ? assets.filter(
         (a) =>
-          a.name.toLowerCase().includes(trimmed) ||
-          a.asset_type.toLowerCase().includes(trimmed) ||
-          a.packing_size.toLowerCase().includes(trimmed)
+          (a.name || '').toLowerCase().includes(trimmed) ||
+          (a.asset_type || '').toLowerCase().includes(trimmed) ||
+          (a.packing_size || '').toLowerCase().includes(trimmed)
       )
     : assets.slice(0, 4);
 

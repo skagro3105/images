@@ -10,14 +10,15 @@ import {
   ChevronRight,
   ZoomIn,
   ZoomOut,
-  Maximize2
+  Maximize2,
+  Trash2
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { Button } from '../ui/Button';
 import { downloadOriginalAsset } from '../../utils/downloadHelper';
 
 export const LightboxViewer = ({ assetList = [], initialAssetId, onClose }) => {
-  const { assets: globalAssets } = useApp();
+  const { assets: globalAssets, deleteAsset } = useApp();
   const list = assetList.length > 0 ? assetList : globalAssets;
   
   const initialIndex = list.findIndex((a) => a.id === initialAssetId);
@@ -49,12 +50,28 @@ export const LightboxViewer = ({ assetList = [], initialAssetId, onClose }) => {
     downloadOriginalAsset(currentAsset.file_url, currentAsset.name, currentAsset.file_type);
   };
 
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete asset "${currentAsset.name}"?`)) {
+      deleteAsset(currentAsset.id);
+      onClose();
+    }
+  };
+
+  // Prevent background scrolling
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95 backdrop-blur-md text-white select-none animate-fadeIn">
+    <div className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-xl">
       {/* Top Header Bar */}
-      <div className="h-16 px-6 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/60">
-        <div className="truncate max-w-md">
-          <h3 className="text-sm font-semibold text-white truncate">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent">
+        {/* Asset Info */}
+        <div className="flex-1 min-w-0 pr-4">
+          <h3 className="text-white font-bold text-lg truncate">
             {currentAsset.name}
           </h3>
           <p className="text-xs text-slate-400 truncate">
@@ -63,7 +80,7 @@ export const LightboxViewer = ({ assetList = [], initialAssetId, onClose }) => {
         </div>
 
         {/* Counter */}
-        <div className="text-xs font-semibold px-3 py-1 bg-slate-800 rounded-full text-slate-300">
+        <div className="text-xs font-semibold px-3 py-1 bg-slate-800 rounded-full text-slate-300 mr-4">
           {currentIndex + 1} / {list.length}
         </div>
 
@@ -74,9 +91,18 @@ export const LightboxViewer = ({ assetList = [], initialAssetId, onClose }) => {
             variant="secondary"
             icon={copied ? Check : Copy}
             onClick={handleCopyLink}
-            className="bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700"
+            className="bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hidden sm:flex"
           >
-            {copied ? 'Copied' : 'Copy Link'}
+            {copied ? 'Copied' : 'Copy'}
+          </Button>
+
+          <Button
+            size="sm"
+            className="bg-red-600 hover:bg-red-700 text-white border-none"
+            icon={Trash2}
+            onClick={handleDelete}
+          >
+            <span className="hidden sm:inline">Delete</span>
           </Button>
 
           <Button
@@ -85,7 +111,7 @@ export const LightboxViewer = ({ assetList = [], initialAssetId, onClose }) => {
             icon={Download}
             onClick={handleDownload}
           >
-            Download
+            <span className="hidden sm:inline">Download</span>
           </Button>
 
           <button

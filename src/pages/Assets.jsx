@@ -14,11 +14,16 @@ export const Assets = ({ onOpenAddAsset }) => {
   const [isZipping, setIsZipping] = useState(false);
 
   const filteredAssets = assets.filter((a) => {
+    const name = (a.name || '').toLowerCase();
+    const productName = (a.product_name || '').toLowerCase();
+    const packingSize = (a.packing_size || '').toLowerCase();
+    const q = searchQuery.toLowerCase();
+
     const matchesSearch =
       !searchQuery ||
-      a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.packing_size.toLowerCase().includes(searchQuery.toLowerCase());
+      name.includes(q) ||
+      productName.includes(q) ||
+      packingSize.includes(q);
 
     const matchesType = selectedType === 'All' || a.asset_type === selectedType;
     return matchesSearch && matchesType;
